@@ -84,7 +84,7 @@ public class Config extends AbstractConfig {
 		ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
 		ServerConfig.GENERAL = new General(SERVER_BUILDER);
 		ServerConfig.PUBLIC_VAULT = new PublicVault(SERVER_BUILDER);
-		ServerConfig.DATABASE = new Db(SERVER_BUILDER);
+
 		SERVER_SPEC = SERVER_BUILDER.build();
 		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SERVER_SPEC);
 	}
@@ -92,6 +92,7 @@ public class Config extends AbstractConfig {
 	private static void registerCommonConfigs() {
 		ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
 		CommonConfig.LOGGING = new Logging(COMMON_BUILDER);
+		ServerConfig.DATABASE = new Db(COMMON_BUILDER);
 		COMMON_SPEC = COMMON_BUILDER.build();
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, COMMON_SPEC);
 	}
