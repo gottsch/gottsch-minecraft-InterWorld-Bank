@@ -38,7 +38,7 @@ credits="" #optional
 authors="gottsch" #optional
 
 # The description text for the mod (multi line!) (#mandatory)
-description="Adds new chests filled with loot to be discovered."
+description="Legacy Vault is a mod that allows a player(s) to store inventory between worlds."
 
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.legacyvault]] #optional
