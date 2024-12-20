@@ -88,13 +88,13 @@ public class Config extends AbstractConfig {
 		ServerConfig.MOD = new Mod(SERVER_BUILDER);
 		ServerConfig.GENERAL = new General(SERVER_BUILDER);
 		ServerConfig.PUBLIC_VAULT = new PublicVault(SERVER_BUILDER);
-		ServerConfig.DATABASE = new Db(SERVER_BUILDER);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SERVER_BUILDER.build());
 	}
 
 	private static void registerCommonConfigs() {
 		ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
 		CommonConfig.LOGGING = new Logging(COMMON_BUILDER);
+		ServerConfig.DATABASE = new Db(COMMON_BUILDER);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, COMMON_BUILDER.build());
 
 	}

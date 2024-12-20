@@ -14,7 +14,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = "mc${mc_version}-f${forge_version}-${mod_version_type}${mod_version}"
+version = "${mc_version}-${mod_version}"
 group = "${package_group}" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "${mod_name}"
 
@@ -138,32 +138,32 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 println "maven dir -> $projectDir"
 println "maven project dir -> $project.projectDir"
 repositories {
-    maven {
-        url "${project.projectDir}/../maven"
-    }
+    mavenLocal()
+//    maven {
+//        url "${project.projectDir}/../maven"
+//    }
     maven {
         name = "CurseMaven"
         url = "https://www.cursemaven.com"
     }
-    
-    // If you have mod jar dependencies in ./libs, you can declare them as a repository like so:
-     //flatDir {
-     //    dir 'libs'
-     //}
 }
 
 dependencies {
     // Specify the version of Minecraft to use. If this is any group other than 'net.minecraft', it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.18.2-40.1.0'
+    minecraft 'net.minecraftforge:forge:1.18.2-40.2.0'
 	
     // Real mod deobf dependency examples - these get remapped to your current mappings
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
     // runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}") // Adds the full JEI mod as a runtime dependency
     // implementation fg.deobf("com.tterrag.registrate:Registrate:MC${mc_version}-${registrate_version}") // Adds registrate as a dependency
-	compileOnly fg.deobf("someguyssoftware.gottschcore:GottschCore:mc1.18.2-f40.1.0-v1.8.0")
-	compileOnly fg.deobf("someguyssoftware.gottschjar:GottschJar:mc1.18.2-f40.1.0-v1.0.0")
+//	compileOnly fg.deobf("someguyssoftware.gottschcore:GottschCore:mc1.18.2-f40.1.0-v1.8.0")
+//	compileOnly fg.deobf("someguyssoftware.gottschjar:GottschJar:mc1.18.2-f40.1.0-v1.0.0")
+    compileOnly fg.deobf("gottsch:gottschcore:1.18.2-2.1.0")
+    implementation fg.deobf("com.h2database:h2:1.4.187")
+    implementation fg.deobf("com.j256.ormlite:ormlite-core:5.0")
+    implementation fg.deobf("com.j256.ormlite:ormlite-jdbc:5.0")
 }
 
 jar {

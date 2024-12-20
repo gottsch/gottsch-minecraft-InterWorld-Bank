@@ -42,6 +42,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
@@ -307,10 +308,14 @@ public class VaultContainerMenu extends AbstractContainerMenu {
 		}
 		
 		// fetch the players account from persistence
-		Optional<Account> account = DbManager.getInstance().getAccount(player.getUUID().toString(), LegacyVault.MC_VERSION, 
-				LegacyVault.instance.isHardCore() ? GameType.HARDCORE.getValue() : GameType.NORMAL.getValue());
+		if (!player.level.isClientSide) {
+			Optional<Account> account = DbManager.getInstance().getAccount(player.getUUID().toString(), LegacyVault.MC_VERSION,
+					LegacyVault.instance.isHardCore() ? GameType.HARDCORE.getValue() : GameType.NORMAL.getValue());
 
-		savePersistedInventory(account.get());
+			if (account.isPresent()) {
+				savePersistedInventory(account.get());
+			}
+		}
 
 		super.removed(player);
 	}
@@ -372,6 +377,10 @@ public class VaultContainerMenu extends AbstractContainerMenu {
 		this.slotYSpacing = slotYSpacing;
 	}
 
+	public int getMenuInventorySlotCount() {
+		return getMenuInventoryRowCount() * getMenuInventoryColumnCount();
+	}
+
 	public int getMenuInventoryRowCount() {
 		return menuInventoryRowCount;
 	}
@@ -406,5 +415,61 @@ public class VaultContainerMenu extends AbstractContainerMenu {
 	
 	public int getVaultsRemainingYPos() {
 		return getHotbarYPos() + getSlotYSpacing() + 2;
+	}
+
+
+	@Override
+	public ItemStack quickMoveStack(Player player, int sourceSlotIndex) {
+		Slot sourceSlot = (Slot) slots.get(sourceSlotIndex);
+		if (sourceSlot == null || !sourceSlot.hasItem())
+			return ItemStack.EMPTY;
+		ItemStack sourceStack = sourceSlot.getItem();
+		ItemStack copyOfSourceStack = sourceStack.copy();
+
+		// Check if the slot clicked is one of the vanilla container slots
+		if (sourceSlotIndex >= VANILLA_FIRST_SLOT_INDEX
+				&& sourceSlotIndex < VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT) {
+			/*
+			 * This is a vanilla container slot so merge the stack into the tile inventory
+			 */
+			// first ensure that the sourcStack is a valid item for the container
+//			if (!displayInventory.canPlaceItem(sourceSlotIndex, sourceStack)) {
+//				return ItemStack.EMPTY;
+//			}
+			if (!this.moveItemStackTo(sourceStack, CONTAINER_INVENTORY_FIRST_SLOT_INDEX, CONTAINER_INVENTORY_FIRST_SLOT_INDEX + getMenuInventorySlotCount(), true)) {
+				return ItemStack.EMPTY;
+			}
+
+//			if (!moveItemStackTo(sourceStack, CONTAINER_INVENTORY_FIRST_SLOT_INDEX,
+//					CONTAINER_INVENTORY_FIRST_SLOT_INDEX + getContainerInventorySlotCount(), false)) {
+//				return ItemStack.EMPTY;
+//			}
+		} else if (sourceSlotIndex >= CONTAINER_INVENTORY_FIRST_SLOT_INDEX
+				&& sourceSlotIndex < CONTAINER_INVENTORY_FIRST_SLOT_INDEX + getMenuInventorySlotCount()) {
+			// This is a TE slot so merge the stack into the players inventory
+			if (!moveItemStackTo(sourceStack, VANILLA_FIRST_SLOT_INDEX, VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT,
+					false)) {
+				return ItemStack.EMPTY;
+			}
+		} else {
+			LegacyVault.LOGGER.warn("Invalid slotIndex:" + sourceSlotIndex);
+			return ItemStack.EMPTY;
+		}
+
+		if (sourceStack.isEmpty()) {
+			sourceSlot.set(ItemStack.EMPTY);
+		} else {
+			sourceSlot.setChanged();
+		}
+		// If stack size == 0 (the entire stack was moved) set slot sourceInventory to
+		// null
+		if (sourceStack.getCount() == 0) { // getStackSize
+			sourceSlot.set(ItemStack.EMPTY);
+		} else {
+			sourceSlot.setChanged();
+		}
+
+		sourceSlot.onTake(player, sourceStack); // onPickupFromSlot()
+		return copyOfSourceStack;
 	}
 }
