@@ -69,10 +69,11 @@ public class Config extends AbstractConfig {
 	static {
 		MOD = new Mod(COMMON_BUILDER);
 		LOGGING = new Logging(COMMON_BUILDER);
-				
+		DATABASE = new Db(COMMON_BUILDER);
+
 		GENERAL = new General(SERVER_BUILDER);
 		PUBLIC_VAULT = new PublicVault(SERVER_BUILDER);
-		DATABASE = new Db(SERVER_BUILDER);
+
 		
 		COMMON_CONFIG = COMMON_BUILDER.build();
 		SERVER_CONFIG = SERVER_BUILDER.build();
